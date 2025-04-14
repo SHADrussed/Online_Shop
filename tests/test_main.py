@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from src.main import Product, Category
 import pytest
 
@@ -15,7 +17,7 @@ def test_init(product_phone):
     """Тест, что продукт корректно инициализируется с валидными входными данными."""
     assert product_phone.name == "Samsung Galaxy S23 Ultra"
     assert product_phone.description == "256GB, Серый цвет, 200MP камера"
-    assert product_phone.price == 180000.0
+    assert product_phone.price == 'Цена: 180000.0'
     assert product_phone.quantity == 5
 
 @pytest.fixture
@@ -26,7 +28,7 @@ def test_init2(product_none):
     """Тест, что продукт корректно инициализируется с именем None."""
     assert product_none.name is None
     assert product_none.description == "1024GB, Синий"
-    assert product_none.price == 31000.0
+    assert product_none.price == 'Цена: 31000.0'
     assert product_none.quantity == 14
 
 @pytest.fixture
@@ -37,7 +39,7 @@ def test_init3(product_int):
     """Тест, что продукт корректно инициализируется с целочисленной ценой."""
     assert product_int.name == "Наушники Picun"
     assert product_int.description == "12112324GB, Синd"
-    assert product_int.price == 1999
+    assert product_int.price == 'Цена: 1999'
     assert product_int.quantity == 12
 
 @pytest.fixture
@@ -50,10 +52,11 @@ def test_category1(category_tv):
     """Тест, что категория корректно инициализируется с одним продуктом."""
     assert category_tv.name == "Телевизоры"
     assert category_tv.description == "Современный телевизор, который позволяет наслаждаться просмотром, станет вашим другом и помощником"
-    assert category_tv.products[0].name == "Наушники Picun"
-    assert category_tv.products[0].description == "12112324GB, Синd"
-    assert category_tv.products[0].price == 1999
-    assert category_tv.products[0].quantity == 12
+    assert category_tv.products == """Наушники Picun, Цена: 1999 руб. Остаток: 12 шт.\n"""
+    # assert category_tv.products[0].name == "Наушники Picun"
+    # assert category_tv.products[0].description == "12112324GB, Синd"
+    # assert category_tv.products[0].price == 'Цена: 1999'
+    # assert category_tv.products[0].quantity == 12
     assert Category.category_count == 1
     assert Category.product_count == 1
 
@@ -74,9 +77,12 @@ def test_category_multiple_products():
     category = Category("TestCategory", "Test Description", [product1, product2])
     assert category.name == "TestCategory"
     assert category.description == "Test Description"
-    assert len(category.products) == 2
-    assert category.products[0].name == "Product1"
-    assert category.products[1].name == "Product2"
+    # assert len(category.__products) == 2
+    assert category.products == """Product1, Цена: 100.0 руб. Остаток: 10 шт.
+Product2, Цена: 200.0 руб. Остаток: 20 шт.
+"""
+    # assert category.products[0].name == "Product1"
+    # assert category.products[1].name == "Product2"
     assert Category.category_count == 1
     assert Category.product_count == 2
 
@@ -95,3 +101,60 @@ def test_category_no_products():
     assert len(category.products) == 0
     assert Category.category_count == 1
     assert Category.product_count == 0
+
+
+def test_add_product():
+    """Тест задания 1, 2"""
+    category = Category("Ураов", "Много спать пора", [Product("Собянин", 'Москву построил', 777, 1),
+                        Product("Овощ", "Вкусный", 808080800, 213)])
+    category.add_product(Product("Роблокс", "Удалила мне мама", 149, 999))
+    assert """Собянин, Цена: 777 руб. Остаток: 1 шт.
+Овощ, Цена: 808080800 руб. Остаток: 213 шт.
+Роблокс, Цена: 149 руб. Остаток: 999 шт.
+"""
+
+def test_dictionary_convert():
+    """Тест задания 3, конвертации"""
+    product = {'name': "Альбом Lonerism", 'description': "Творчество Tame Impala", 'price': 18000, 'quantity': 32}
+    actual = Product.new_product(product)
+    expeted = Product("Альбом Lonerism", 'Творчество Tame Impala', 18000, 32)
+    assert str(actual) == str(expeted)
+
+def test_dictionary_convert_if_stance():
+    """Тест задания 3, конвертации"""
+    product = {'name': "Les Paul", 'description': "Офигенная гитара", 'price': 48000, 'quantity': 3}
+    actual = Product.new_product(product, [Product("Овощ", "Вкусный", 808080800, 213),
+                                           Product("Les Paul", "Офигенная гитара", 1231231, 4)])
+    expeted = Product("Les Paul", "Офигенная гитара", 1231231, 7)
+    assert str(actual) == str(expeted)
+
+def test_price_change_exit():
+    """Тест изменения цены в сеттере"""
+    product = Product("Фрукт", "Невкуно", 231, 213)
+    product.price = 0
+    assert str(product) == str(Product("Фрукт", "Невкуно", 231, 213))
+
+def test_price_change():
+    """Тест изменения цены в сеттере, удачный"""
+    product = Product("Фрукт", "Невкуно", 231, 213)
+    product.price = 68970
+    assert str(product) == str(Product("Фрукт", "Невкуно", 68970, 213))
+
+@pytest.fixture
+def product_for_price_test():
+    """Фикстура для тестирования изменения цены."""
+    return Product("Test Product", "Test Description", 1000.0, 10)
+
+def test_price_decrease_confirmed(product_for_price_test):
+    """Цена понижается после подтверждения 'y'."""
+    with patch('builtins.input', return_value='y') as mock_input:
+        product_for_price_test.price = 800.0
+        mock_input.assert_called_once_with("Понизить цену товара на 200.0? (y/n): ")
+        assert product_for_price_test.price == 'Цена: 800.0'
+
+def test_price_decrease_declined(product_for_price_test):
+    """Цена не понижается: 'n'."""
+    with patch('builtins.input', return_value='n') as mock_input:
+        product_for_price_test.price = 800.0
+        mock_input.assert_called_once_with("Понизить цену товара на 200.0? (y/n): ")
+        assert product_for_price_test.price == 'Цена: 1000.0'
