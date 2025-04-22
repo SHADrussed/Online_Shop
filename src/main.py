@@ -11,7 +11,7 @@ class Product:
         self.quantity = quantity
 
     def __str__(self):
-        return f"Product(name={self.name}, description={self.description}, price={self.__price}, quantity={self.quantity})"
+        return f'{self.name}, {self.price} руб. Остаток: {self.quantity} шт.'
     @property
     def price(self):
         return f'Цена: {self.__price}'
@@ -45,6 +45,8 @@ class Product:
             products.append(new_product)
 
         return new_product
+    def __add__(self, other):
+        return self.quantity * self.__price + other.quantity * other.__price
 
 class Category:
     name: str
@@ -72,6 +74,20 @@ class Category:
         for product in self.__products:
             product_output += f'{product.name}, {product.price} руб. Остаток: {product.quantity} шт.\n'
         return product_output
+
+    def __str__(self):
+        return f'{self.name}, количество продуктов: {sum([i.quantity for i in self.__products])} шт.'
+
+    def __iter__(self):
+        self.starting_point = -1
+        return self
+
+    def __next__(self):
+        if self.starting_point + 1 < len(self.__products):
+            self.starting_point += 1
+            return self.__products[self.starting_point]
+        else:
+            StopIteration
 
 
 

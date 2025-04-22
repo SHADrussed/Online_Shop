@@ -24,6 +24,10 @@ def test_init(product_phone):
 def product_none():
     return Product(None, "1024GB, Синий", 31000.0, 14)
 
+def test_add():
+    assert (Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+            + Product(None, "1024GB, Синий", 31000.0, 14) == 900000 + 31000 * 14)
+
 def test_init2(product_none):
     """Тест, что продукт корректно инициализируется с именем None."""
     assert product_none.name is None
@@ -62,12 +66,12 @@ def test_category1(category_tv):
 
 def test_product_str(product_phone):
     """Тест, что метод __str__ возвращает правильное строковое представление продукта."""
-    expected_str = "Product(name=Samsung Galaxy S23 Ultra, description=256GB, Серый цвет, 200MP камера, price=180000.0, quantity=5)"
+    expected_str = 'Samsung Galaxy S23 Ultra, Цена: 180000.0 руб. Остаток: 5 шт.'
     assert str(product_phone) == expected_str
 
 def test_product_str_none_name(product_none):
     """Тест, что метод __str__ корректно обрабатывает продукт с именем None."""
-    expected_str = "Product(name=None, description=1024GB, Синий, price=31000.0, quantity=14)"
+    expected_str = 'None, Цена: 31000.0 руб. Остаток: 14 шт.'
     assert str(product_none) == expected_str
 
 def test_category_multiple_products():
