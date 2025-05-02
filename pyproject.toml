@@ -8,12 +8,9 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-<<<<<<< HEAD
     "pytest (>=8.3.5,<9.0.0)",
     "pytest-cov (>=6.1.1,<7.0.0)",
     "black (>=25.1.0,<26.0.0)"
-=======
->>>>>>> 20699c64f6b0cba573a34d7b7ddefbe9906155a4
 ]
 
 
