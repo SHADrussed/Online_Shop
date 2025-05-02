@@ -11,27 +11,34 @@ class Product:
         self.quantity = quantity
 
     def __str__(self):
-        return f'{self.name}, {self.price} руб. Остаток: {self.quantity} шт.'
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
+
     @property
     def price(self):
-        return f'Цена: {self.__price}'
+        return f"Цена: {self.__price}"
 
     @price.setter
     def price(self, new_value):
         if new_value <= 0:
-            print('Цена не должна быть нулевая или отрицательная')
+            print("Цена не должна быть нулевая или отрицательная")
         else:
             if new_value < self.__price:
-                user_answer = input(f"Понизить цену товара на {self.__price - new_value}? (y/n): ")
-                if user_answer == 'y':
+                user_answer = input(
+                    f"Понизить цену товара на {self.__price - new_value}? (y/n): "
+                )
+                if user_answer == "y":
                     self.__price = new_value
             else:
                 self.__price = new_value
 
-
     @classmethod
     def new_product(cls, data: dict, products: list = None):
-        name, description, price, quantity = data.get('name'), data.get('description'), data.get('price'), data.get('quantity')
+        name, description, price, quantity = (
+            data.get("name"),
+            data.get("description"),
+            data.get("price"),
+            data.get("quantity"),
+        )
         if products:
             for product in products:
                 if product.name == name:
@@ -45,6 +52,7 @@ class Product:
             products.append(new_product)
 
         return new_product
+
     def __add__(self, other):
         if type(self) != type(other):
             raise TypeError("Нельзя складывать разные классы продуктов")
@@ -52,15 +60,20 @@ class Product:
 
 
 class Smartphone(Product):
-    def __init__(self, name, description, price, quantity, efficiency, model, memory, color):
+    def __init__(
+        self, name, description, price, quantity, efficiency, model, memory, color
+    ):
         super().__init__(name, description, price, quantity)
         self.efficiency = efficiency
         self.model = model
         self.memory = memory
         self.color = color
 
+
 class LawnGrass(Product):
-    def __init__(self, name, description, price, quantity, country, germination_period, color):
+    def __init__(
+        self, name, description, price, quantity, country, germination_period, color
+    ):
         super().__init__(name, description, price, quantity)
         self.country = country
         self.germination_period = germination_period
@@ -83,19 +96,21 @@ class Category:
 
     def add_product(self, product):
         if not isinstance(product, Product) or not issubclass(type(product), Product):
-            raise TypeError("Можно добавить только объекты класса Product и его подклассов")
+            raise TypeError(
+                "Можно добавить только объекты класса Product и его подклассов"
+            )
         self.__products.append(product)
         Category.category_count += 1
 
     @property
     def products(self):
-        product_output = ''
+        product_output = ""
         for product in self.__products:
-            product_output += f'{product.name}, {product.price} руб. Остаток: {product.quantity} шт.\n'
+            product_output += f"{product.name}, {product.price} руб. Остаток: {product.quantity} шт.\n"
         return product_output
 
     def __str__(self):
-        return f'{self.name}, количество продуктов: {sum([i.quantity for i in self.__products])} шт.'
+        return f"{self.name}, количество продуктов: {sum([i.quantity for i in self.__products])} шт."
 
     def __iter__(self):
         self.starting_point = -1
@@ -107,7 +122,6 @@ class Category:
             return self.__products[self.starting_point]
         else:
             StopIteration
-
 
 
 # if __name__ == "__main__":
