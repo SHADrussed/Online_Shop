@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from src.main import Product, Category
+from src.main import Product, Category, Smartphone, LawnGrass
 import pytest
 
 @pytest.fixture(autouse=True)
@@ -162,3 +162,40 @@ def test_price_decrease_declined(product_for_price_test):
         product_for_price_test.price = 800.0
         mock_input.assert_called_once_with("Понизить цену товара на 200.0? (y/n): ")
         assert product_for_price_test.price == 'Цена: 1000.0'
+
+
+#       ТЕСТЫ ФУНКЦИОНАЛА ИЗ 16.1, А ИМЕННО subclass of Product and __add__ of Product, also .append method check ones
+
+# Фикстура для теста смартфона
+@pytest.fixture
+def smartphone_product():
+    return Smartphone("Redmi note 8 pro", "ЛУчший, уже 6 лет держится", 18000.0, 4, 404, '8 pro', '64/128 GB', 'Black')
+# Ну, без айфона никуда, для теста add
+@pytest.fixture
+def iphone_product():
+    return Smartphone("IPhone 17", "Когда-нибудь выйдет", 119000, 1, 821, '17 MAX', '256/592 GB', 'Ion')
+
+def test_smartphone_and_lawn_grass(smartphone_product):
+    """Тесты на проверку создания подклассов"""
+    lawn_product = LawnGrass("Трава", "Газончик, мой любимый. Ее обычно нехватает дотерам и тем, кто играет свип на гитаре", 119000, 1, 'Кризкистан', '1 год', 'red')
+    assert str(lawn_product) == 'Трава, Цена: 119000 руб. Остаток: 1 шт.'
+    assert str(smartphone_product) == 'Redmi note 8 pro, Цена: 18000.0 руб. Остаток: 4 шт.'
+
+
+def test_new_add_in_product(smartphone_product, iphone_product):
+    """Тест на __адд__ для продакт"""
+    expected = 191000
+    actual = smartphone_product + iphone_product
+    assert expected == actual
+
+# Ошибка в __адд__
+def test_new_add_in_product_error(smartphone_product, product_for_price_test):
+    """Тест на вызов ошибки в сложении, соответственно"""
+    with pytest.raises(TypeError):
+        smartphone_product + product_for_price_test
+
+def test_append(category_tv, smartphone_product):
+    """Тест на добавления товара в список и его ошибки"""
+    with pytest.raises(TypeError):
+        category_tv.add_product('фигня')
+    category_tv.add_product(smartphone_product)

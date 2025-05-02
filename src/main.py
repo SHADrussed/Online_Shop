@@ -46,7 +46,26 @@ class Product:
 
         return new_product
     def __add__(self, other):
+        if type(self) != type(other):
+            raise TypeError("Нельзя складывать разные классы продуктов")
         return self.quantity * self.__price + other.quantity * other.__price
+
+
+class Smartphone(Product):
+    def __init__(self, name, description, price, quantity, efficiency, model, memory, color):
+        super().__init__(name, description, price, quantity)
+        self.efficiency = efficiency
+        self.model = model
+        self.memory = memory
+        self.color = color
+
+class LawnGrass(Product):
+    def __init__(self, name, description, price, quantity, country, germination_period, color):
+        super().__init__(name, description, price, quantity)
+        self.country = country
+        self.germination_period = germination_period
+        self.color = color
+
 
 class Category:
     name: str
@@ -63,8 +82,8 @@ class Category:
         Category.product_count += len(products)
 
     def add_product(self, product):
-        if not isinstance(product, Product):
-            raise TypeError("Можно добавить только объекты класса Product")
+        if not isinstance(product, Product) or not issubclass(type(product), Product):
+            raise TypeError("Можно добавить только объекты класса Product и его подклассов")
         self.__products.append(product)
         Category.category_count += 1
 
