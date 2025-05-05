@@ -11,7 +11,7 @@ class Product:
         self.quantity = quantity
 
     def __str__(self):
-        return f"Product(name={self.name}, description={self.description}, price={self.__price}, quantity={self.quantity})"
+        return f'{self.name}, {self.price} руб. Остаток: {self.quantity} шт.'
     @property
     def price(self):
         return f'Цена: {self.__price}'
@@ -45,6 +45,27 @@ class Product:
             products.append(new_product)
 
         return new_product
+    def __add__(self, other):
+        if type(self) != type(other):
+            raise TypeError("Нельзя складывать разные классы продуктов")
+        return self.quantity * self.__price + other.quantity * other.__price
+
+
+class Smartphone(Product):
+    def __init__(self, name, description, price, quantity, efficiency, model, memory, color):
+        super().__init__(name, description, price, quantity)
+        self.efficiency = efficiency
+        self.model = model
+        self.memory = memory
+        self.color = color
+
+class LawnGrass(Product):
+    def __init__(self, name, description, price, quantity, country, germination_period, color):
+        super().__init__(name, description, price, quantity)
+        self.country = country
+        self.germination_period = germination_period
+        self.color = color
+
 
 class Category:
     name: str
@@ -61,8 +82,8 @@ class Category:
         Category.product_count += len(products)
 
     def add_product(self, product):
-        if not isinstance(product, Product):
-            raise TypeError("Можно добавить только объекты класса Product")
+        if not isinstance(product, Product) or not issubclass(type(product), Product):
+            raise TypeError("Можно добавить только объекты класса Product и его подклассов")
         self.__products.append(product)
         Category.category_count += 1
 
@@ -72,6 +93,20 @@ class Category:
         for product in self.__products:
             product_output += f'{product.name}, {product.price} руб. Остаток: {product.quantity} шт.\n'
         return product_output
+
+    def __str__(self):
+        return f'{self.name}, количество продуктов: {sum([i.quantity for i in self.__products])} шт.'
+
+    def __iter__(self):
+        self.starting_point = -1
+        return self
+
+    def __next__(self):
+        if self.starting_point + 1 < len(self.__products):
+            self.starting_point += 1
+            return self.__products[self.starting_point]
+        else:
+            StopIteration
 
 
 

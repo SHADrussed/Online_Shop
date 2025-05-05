@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from src.main import Product, Category
+from src.main import Product, Category, Smartphone, LawnGrass
 import pytest
 
 @pytest.fixture(autouse=True)
@@ -23,6 +23,10 @@ def test_init(product_phone):
 @pytest.fixture
 def product_none():
     return Product(None, "1024GB, Синий", 31000.0, 14)
+
+def test_add():
+    assert (Product("Samsung Galaxy S23 Ultra", "256GB, Серый цвет, 200MP камера", 180000.0, 5)
+            + Product(None, "1024GB, Синий", 31000.0, 14) == 900000 + 31000 * 14)
 
 def test_init2(product_none):
     """Тест, что продукт корректно инициализируется с именем None."""
@@ -62,12 +66,12 @@ def test_category1(category_tv):
 
 def test_product_str(product_phone):
     """Тест, что метод __str__ возвращает правильное строковое представление продукта."""
-    expected_str = "Product(name=Samsung Galaxy S23 Ultra, description=256GB, Серый цвет, 200MP камера, price=180000.0, quantity=5)"
+    expected_str = 'Samsung Galaxy S23 Ultra, Цена: 180000.0 руб. Остаток: 5 шт.'
     assert str(product_phone) == expected_str
 
 def test_product_str_none_name(product_none):
     """Тест, что метод __str__ корректно обрабатывает продукт с именем None."""
-    expected_str = "Product(name=None, description=1024GB, Синий, price=31000.0, quantity=14)"
+    expected_str = 'None, Цена: 31000.0 руб. Остаток: 14 шт.'
     assert str(product_none) == expected_str
 
 def test_category_multiple_products():
@@ -158,3 +162,40 @@ def test_price_decrease_declined(product_for_price_test):
         product_for_price_test.price = 800.0
         mock_input.assert_called_once_with("Понизить цену товара на 200.0? (y/n): ")
         assert product_for_price_test.price == 'Цена: 1000.0'
+
+
+#       ТЕСТЫ ФУНКЦИОНАЛА ИЗ 16.1, А ИМЕННО subclass of Product and __add__ of Product, also .append method check ones
+
+# Фикстура для теста смартфона
+@pytest.fixture
+def smartphone_product():
+    return Smartphone("Redmi note 8 pro", "ЛУчший, уже 6 лет держится", 18000.0, 4, 404, '8 pro', '64/128 GB', 'Black')
+# Ну, без айфона никуда, для теста add
+@pytest.fixture
+def iphone_product():
+    return Smartphone("IPhone 17", "Когда-нибудь выйдет", 119000, 1, 821, '17 MAX', '256/592 GB', 'Ion')
+
+def test_smartphone_and_lawn_grass(smartphone_product):
+    """Тесты на проверку создания подклассов"""
+    lawn_product = LawnGrass("Трава", "Газончик, мой любимый. Ее обычно нехватает дотерам и тем, кто играет свип на гитаре", 119000, 1, 'Кризкистан', '1 год', 'red')
+    assert str(lawn_product) == 'Трава, Цена: 119000 руб. Остаток: 1 шт.'
+    assert str(smartphone_product) == 'Redmi note 8 pro, Цена: 18000.0 руб. Остаток: 4 шт.'
+
+
+def test_new_add_in_product(smartphone_product, iphone_product):
+    """Тест на __адд__ для продакт"""
+    expected = 191000
+    actual = smartphone_product + iphone_product
+    assert expected == actual
+
+# Ошибка в __адд__
+def test_new_add_in_product_error(smartphone_product, product_for_price_test):
+    """Тест на вызов ошибки в сложении, соответственно"""
+    with pytest.raises(TypeError):
+        smartphone_product + product_for_price_test
+
+def test_append(category_tv, smartphone_product):
+    """Тест на добавления товара в список и его ошибки"""
+    with pytest.raises(TypeError):
+        category_tv.add_product('фигня')
+    category_tv.add_product(smartphone_product)
