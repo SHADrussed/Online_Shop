@@ -102,7 +102,6 @@ class BaseCategoryOrder:
     def __init__(self):
         pass
 
-
 class Category(ABC, BaseCategoryOrder):
     name: str
     description: str
@@ -163,6 +162,12 @@ class Order(ABC, BaseCategoryOrder):
 
     def total(self):
         return f'Полная цена: {self.total} руб.'
+
+
+
+
+# gno = Product('name', 'desc', 18, 1)
+
 
 
 
