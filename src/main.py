@@ -27,7 +27,7 @@ class MixinLog:
         print(f'{self.__class__.__name__}({self.name}, {self.description}, {self._Product__price}, {self.quantity})')
 
 
-class Product(ABC, MixinLog):
+class Product(BaseProduct, ABC, MixinLog):
     name: str
     description: str
     __price: float
@@ -97,13 +97,12 @@ class LawnGrass(Product):
         self.color = color
 
 
-class BaseCategoryProduct:
+class BaseCategoryOrder:
     @abstractmethod
     def __init__(self):
         pass
 
-
-class Category(ABC):
+class Category(ABC, BaseCategoryOrder):
     name: str
     description: str
     __products: list[Product]
@@ -144,6 +143,30 @@ class Category(ABC):
         else:
             StopIteration
 
+
+class Order(ABC, BaseCategoryOrder):
+    product: str
+    quantity: int
+    total: float
+
+    def __init__(self, product, quantity, total):
+        self.product = product
+        self.quantity = quantity
+        self.total = total
+
+    def product(self):
+        return f'Продукт: {self.product}'
+
+    def quantity(self):
+        return f'Количество: {self.quantity} шт.'
+
+    def total(self):
+        return f'Полная цена: {self.total} руб.'
+
+
+
+
+# gno = Product('name', 'desc', 18, 1)
 
 
 
