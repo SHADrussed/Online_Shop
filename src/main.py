@@ -1,4 +1,33 @@
-class Product:
+from abc import ABC, abstractmethod
+
+
+class BaseProduct:
+    @abstractmethod
+    def __init__(self):
+        pass
+
+    @abstractmethod
+    def __str__(self):
+        pass
+
+    @abstractmethod
+    def price(self):
+        pass
+
+    @abstractmethod
+    def new_product(self):
+        pass
+
+    @abstractmethod
+    def __add__(self, other):
+        pass
+
+class MixinLog:
+    def __init__(self):
+        print(f'{self.__class__.__name__}({self.name}, {self.description}, {self._Product__price}, {self.quantity})')
+
+
+class Product(ABC, MixinLog):
     name: str
     description: str
     __price: float
@@ -9,6 +38,7 @@ class Product:
         self.description = description
         self.__price = price
         self.quantity = quantity
+        super().__init__()
 
     def __str__(self):
         return f'{self.name}, {self.price} руб. Остаток: {self.quantity} шт.'
@@ -67,7 +97,13 @@ class LawnGrass(Product):
         self.color = color
 
 
-class Category:
+class BaseCategoryProduct:
+    @abstractmethod
+    def __init__(self):
+        pass
+
+
+class Category(ABC):
     name: str
     description: str
     __products: list[Product]
@@ -108,6 +144,12 @@ class Category:
         else:
             StopIteration
 
+
+
+
+
+
+# gno = Product('name', 'desc', 18, 1)
 
 
 # if __name__ == "__main__":
