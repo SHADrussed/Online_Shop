@@ -2,7 +2,6 @@ from unittest.mock import patch
 
 from src.main import Product, Category, Smartphone, LawnGrass, BaseProduct, Order, MixinLog, \
     BaseCategoryOrder
-import pytest
 
 
 @pytest.fixture(autouse=True)
