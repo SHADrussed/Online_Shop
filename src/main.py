@@ -27,7 +27,7 @@ class MixinLog:
         print(f'{self.__class__.__name__}({self.name}, {self.description}, {self._Product__price}, {self.quantity})')
 
 
-class Product(ABC, MixinLog):
+class Product(BaseProduct, ABC, MixinLog):
     name: str
     description: str
     __price: float
@@ -97,13 +97,13 @@ class LawnGrass(Product):
         self.color = color
 
 
-class BaseCategoryProduct:
+class BaseCategoryOrder:
     @abstractmethod
     def __init__(self):
         pass
 
 
-class Category(ABC):
+class Category(ABC, BaseCategoryOrder):
     name: str
     description: str
     __products: list[Product]
@@ -145,7 +145,7 @@ class Category(ABC):
             StopIteration
 
 
-class Order(ABC):
+class Order(ABC, BaseCategoryOrder):
     product: str
     quantity: int
     total: float

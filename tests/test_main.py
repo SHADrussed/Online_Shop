@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
-from src.main import Product, Category, Smartphone, LawnGrass, BaseProduct, Order
+from src.main import Product, Category, Smartphone, LawnGrass, BaseProduct, Order, MixinLog, \
+    BaseCategoryOrder
 import pytest
 
 
@@ -230,3 +231,50 @@ def test_append(category_tv, smartphone_product):
     category_tv.add_product(smartphone_product)
 
 
+def test_base_product_is_abstract():
+    with pytest.raises(TypeError):
+        BaseProduct('as')
+
+def test_product_inherits_base_product():
+    assert issubclass(Product, BaseProduct) is True
+
+
+def test_smartphone_inherits_product():
+    assert issubclass(Smartphone, Product)
+
+def test_lawn_grass_inherits_product():
+    assert issubclass(LawnGrass, Product)
+
+def test_mixinlog_in_product_mro():
+    assert MixinLog in Product.__mro__, "MixinLog должен быть в цепочке наследования Product"
+
+def test_mixinlog_output_on_product_creation(capsys):
+    product = Product("Test", "Description", 100.0, 5)
+    captured = capsys.readouterr()
+    expected_output = "Product(Test, Description, 100.0, 5)"
+    assert captured.out in expected_output
+
+def test_base_category_product_is_abstract():
+    with pytest.raises(TypeError):
+        BaseCategoryOrder('a')
+
+def test_category_inherits_base_category_product():
+    assert issubclass(Category, BaseCategoryOrder)
+
+
+def test_order_inherits_base_category_product():
+    assert issubclass(Order, BaseCategoryOrder)
+
+def test_category_implements_abstract_methods():
+    assert '__init__' in Category.__dict__
+
+def test_order_implements_abstract_methods():
+    assert '__init__' in Order.__dict__
+
+def test_existing_product_functionality():
+    product = Product("Test", "Desc", 100.0, 5)
+    assert str(product) == 'Test, Цена: 100.0 руб. Остаток: 5 шт.'
+
+def test_existing_category_functionality():
+    category = Category("Test", "Desc", [])
+    assert str(category) == "Test, количество продуктов: 0 шт."
