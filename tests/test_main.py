@@ -1,4 +1,5 @@
 from unittest.mock import patch
+import pytest
 
 from src.main import Product, Category, Smartphone, LawnGrass, BaseProduct, Order, MixinLog, \
     BaseCategoryOrder
