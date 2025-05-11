@@ -27,16 +27,18 @@ class MixinLog:
         print(f'{self.__class__.__name__}({self.name}, {self.description}, {self._Product__price}, {self.quantity})')
 
 
-class Product(BaseProduct, ABC, MixinLog):
+class Product(BaseProduct, MixinLog):
     name: str
     description: str
-    __price: float
+    _price: float
     quantity: int
 
     def __init__(self, name, description, price, quantity):
+        if not quantity:
+            raise ValueError('Товар с нулевым количеством не может быть добавлен')
         self.name = name
         self.description = description
-        self.__price = price
+        self._price = price
         self.quantity = quantity
         super().__init__()
 
@@ -44,19 +46,19 @@ class Product(BaseProduct, ABC, MixinLog):
         return f'{self.name}, {self.price} руб. Остаток: {self.quantity} шт.'
     @property
     def price(self):
-        return f'Цена: {self.__price}'
+        return f'Цена: {self._price}'
 
     @price.setter
     def price(self, new_value):
         if new_value <= 0:
             print('Цена не должна быть нулевая или отрицательная')
         else:
-            if new_value < self.__price:
-                user_answer = input(f"Понизить цену товара на {self.__price - new_value}? (y/n): ")
+            if new_value < self._price:
+                user_answer = input(f"Понизить цену товара на {self._price - new_value}? (y/n): ")
                 if user_answer == 'y':
-                    self.__price = new_value
+                    self._price = new_value
             else:
-                self.__price = new_value
+                self._price = new_value
 
 
     @classmethod
@@ -66,8 +68,8 @@ class Product(BaseProduct, ABC, MixinLog):
             for product in products:
                 if product.name == name:
                     product.quantity += quantity
-                    if price > product.__price:
-                        product.__price = price
+                    if price > product._price:
+                        product._price = price
                     return product
         new_product = cls(name, description, price, quantity)
 
@@ -78,7 +80,7 @@ class Product(BaseProduct, ABC, MixinLog):
     def __add__(self, other):
         if type(self) != type(other):
             raise TypeError("Нельзя складывать разные классы продуктов")
-        return self.quantity * self.__price + other.quantity * other.__price
+        return self.quantity * self._price + other.quantity * other._price
 
 
 class Smartphone(Product):
@@ -102,7 +104,7 @@ class BaseCategoryOrder:
     def __init__(self):
         pass
 
-class Category(ABC, BaseCategoryOrder):
+class Category(BaseCategoryOrder):
     name: str
     description: str
     __products: list[Product]
@@ -143,8 +145,16 @@ class Category(ABC, BaseCategoryOrder):
         else:
             StopIteration
 
+    def average_pricetag(self):
+        try:
+            total = sum(p._price for p in self.__products)
+            return total / len(self.__products)
+        except ZeroDivisionError:
+            return 0.0
 
-class Order(ABC, BaseCategoryOrder):
+
+
+class Order(BaseCategoryOrder):
     product: str
     quantity: int
     total: float
