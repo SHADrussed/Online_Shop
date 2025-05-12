@@ -1,4 +1,5 @@
 from unittest.mock import patch
+import pytest
 
 from src.main import Product, Category, Smartphone, LawnGrass, BaseProduct, Order, MixinLog, \
     BaseCategoryOrder
@@ -277,3 +278,22 @@ def test_existing_product_functionality():
 def test_existing_category_functionality():
     category = Category("Test", "Desc", [])
     assert str(category) == "Test, количество продуктов: 0 шт."
+
+
+# ТЕСТЫ ДЛЯ 17.1
+
+def test_raise_product():
+    with pytest.raises(ValueError, match='Товар с нулевым количеством не может быть добавлен'):
+        product = Product("Test", "Desc", 100.0, 0)
+
+def test_zero_div_zero():
+    cat = Category("Телевизоры",
+                    "Современный телевизор, который позволяет наслаждаться просмотром, станет вашим другом и помощником",
+                    [])
+    assert cat.average_pricetag() == 0.0
+
+def test_zero_div():
+    caaa = Category("Телевизоры",
+                    "Современный телевизор, который позволяет наслаждаться просмотром, станет вашим другом и помощником",
+                    [Product("Test", "Desc", 100.0, 5), Product("Test Product", "Test Description", 1000.0, 10)])
+    assert caaa.average_pricetag() == 550.0
